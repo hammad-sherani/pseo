@@ -7,6 +7,7 @@ import { jsonLdScript, pageJsonLd, pageMetadata } from "@/seo";
 import { themeStyle } from "@/theme/themes";
 import { CalendarIcon, FormulaIcon, INTENT_ICONS, LockIcon } from "@/components/icons";
 import { Toc } from "@/components/Toc";
+import { AdSlot } from "@/components/AdSlot";
 import type { ContentSection, Page } from "@/schemas/page";
 
 const SECTION_LABELS: Record<ContentSection, { id: string; label: string }> = {
@@ -86,17 +87,23 @@ export default async function ToolPage({ params }: { params: Params }) {
           <section aria-label={`${content.h1} tool`} className="workspace">
             <ToolRuntime slug={page.slug} engineKey={page.engine} params={page.params} ui={ui} />
           </section>
+          <AdSlot position="belowTool" />
 
           <div className="page-body">
             <div className="page-sections">
-              {sections.map((key) => {
+              {sections.map((key, i) => {
                 const Section = SECTION_COMPONENTS[key];
-                return <Section key={key} page={page} related={related} />;
+                // One mid-content ad after the second section, only on pages long enough to carry it.
+                return i === 1 && sections.length > 2
+                  ? [<Section key={key} page={page} related={related} />, <AdSlot key="ad" position="inContent" />]
+                  : <Section key={key} page={page} related={related} />;
               })}
+              <AdSlot position="end" />
             </div>
             {sections.length > 1 && (
               <aside className="page-rail">
                 <Toc items={sections.map((k) => SECTION_LABELS[k])} />
+                <AdSlot position="rail" />
               </aside>
             )}
           </div>

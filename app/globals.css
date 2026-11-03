@@ -254,7 +254,7 @@ kbd {
 .site-footer { margin-top: clamp(80px, 10vw, 128px); padding-block: var(--s-7) var(--s-6); background: var(--raise); box-shadow: inset 0 1px 0 var(--line); }
 .footer-inner { display: grid; gap: var(--s-6) var(--s-5); grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
 .footer-brand { grid-column: 1 / -1; max-width: 320px; }
-@media (min-width: 900px) { .footer-inner { grid-template-columns: 2fr repeat(3, 1fr); } .footer-brand { grid-column: auto; } }
+@media (min-width: 900px) { .footer-inner { grid-template-columns: 2fr repeat(4, 1fr); } .footer-brand { grid-column: auto; } }
 .footer-title { margin: 0; font-weight: 720; letter-spacing: -.01em; }
 .footer-brand p:not(.footer-title) { margin: var(--s-2) 0 0; color: var(--ink-3); font-size: 14px; }
 .footer-col h2 { font-family: var(--font-sans); font-size: 12px; font-weight: 650; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-3); }
@@ -404,6 +404,19 @@ kbd {
 @media (min-width: 960px) { .hub-header-grid { grid-template-columns: minmax(0, 1fr) 280px; gap: var(--s-8); } }
 .hub-header h1 { font-size: clamp(34px, 5vw, 56px); font-weight: 760; letter-spacing: -.04em; line-height: 1.04; margin: var(--s-5) 0 var(--s-3); }
 .hub-body { padding-top: var(--s-5); }
+
+/* ---------- Site pages (About, Contact, Privacy) ---------- */
+.info-updated { margin: var(--s-4) 0 0; font-size: 13.5px; color: var(--ink-3); }
+.info-body { padding-block: var(--s-7) var(--s-8); }
+.info-body > section { max-width: 720px; }
+.info-body section + section { margin-top: var(--s-7); padding-top: var(--s-6); box-shadow: inset 0 1px 0 var(--line); }
+.info-body h2 { font-size: 21px; letter-spacing: -.015em; margin: 0 0 var(--s-3); }
+.info-body p { color: var(--ink-2); line-height: 1.7; margin: 0 0 var(--s-3); }
+.info-body a { color: var(--brand); }
+.info-email { font-size: 19px; font-weight: 650; }
+.info-list { display: grid; gap: var(--s-4); margin: 0; }
+.info-list dt { font-weight: 650; }
+.info-list dd { margin: 4px 0 0; color: var(--ink-2); }
 
 /* ---------- Tool page ---------- */
 .tool-head {
@@ -659,6 +672,16 @@ tbody tr:hover { background: color-mix(in srgb, var(--surface) 60%, transparent)
 }
 .toc a:hover { color: var(--ink); }
 .toc a[aria-current="true"] { color: var(--accent); font-weight: 600; box-shadow: inset 2px 0 0 var(--accent); }
+
+/* ---------- Ads (rendered only when AdSense is switched on) ---------- */
+/* Space is reserved up front so a late-loading ad never shifts the page. */
+.ad { display: grid; gap: 6px; min-width: 0; }
+.ad-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.ad ins { display: block; min-height: 250px; }
+.ad-belowTool { max-width: 740px; margin-top: var(--s-7); }
+.ad-rail { margin-top: var(--s-6); }
+.ad-rail ins { width: 160px; min-height: 600px; }
+@media (min-width: 700px) { .ad-belowTool ins, .ad-inContent ins, .ad-end ins { min-height: 280px; } }
 
 /* Section headings carry a running number: 01, 02, … */
 .prose { counter-increment: sec; }

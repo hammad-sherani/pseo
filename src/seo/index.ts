@@ -4,6 +4,8 @@ import { INDEX_THRESHOLD } from "@/lib/quality";
 
 export const SITE_URL = (process.env.SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 export const SITE_NAME = "Toolhaus";
+/** Public contact address shown on /contact; unset hides the email link. */
+export const CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() ?? "";
 
 export const pagePath = (p: Pick<Page, "cluster" | "slug">) => `/${p.cluster}/${p.slug}`;
 

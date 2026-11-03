@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
+import { ADSENSE_CLIENT, ADS_ENABLED } from "@/ads/config";
 import { CommandMenu } from "@/components/CommandMenu";
 import { SiteChrome } from "@/components/SiteChrome";
 import { THEME_INIT_SCRIPT } from "@/theme/themes";
@@ -24,6 +26,7 @@ const FOOTER_LINKS = [
   { title: "Finance", links: [["/finance", "All loan calculators"], ["/finance/mortgage-calculator", "Mortgage calculator"], ["/finance/auto-loan-calculator", "Auto loan calculator"]] },
   { title: "Converters", links: [["/converters", "All unit converters"], ["/converters/kg-to-lbs", "Kilograms to pounds"], ["/converters/celsius-to-fahrenheit", "Celsius to Fahrenheit"]] },
   { title: "Text", links: [["/text", "All text tools"], ["/text/word-counter", "Word counter"], ["/text/character-counter", "Character counter"]] },
+  { title: "Site", links: [["/about", "About"], ["/contact", "Contact"], ["/privacy", "Privacy policy"]] },
 ] as const;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -60,6 +63,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </div>
         <CommandMenu items={nav.search} />
+        {ADS_ENABLED && (
+          <Script
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        )}
       </body>
     </html>
   );
