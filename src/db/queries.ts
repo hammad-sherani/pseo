@@ -46,7 +46,11 @@ function seedRepo(): PageRepo {
 }
 
 function pgRepo(url: string): PageRepo {
-  const db = drizzle(postgres(url, { max: 5 }), { schema });
+  // Few connections per process: the build runs 4 workers (next.config cpus) and
+  // they all share the pooler's limit (Supabase session pooler: 15 clients).
+  // prepare: false keeps it usable behind PgBouncer-style poolers, but Supabase's
+  // transaction pooler (6543) was too slow for a full build; use the session pooler.
+  const db = drizzle(postgres(url, { max: 2, prepare: false, idle_timeout: 20 }), { schema });
   const { pages, keywordClusters: clusters, pageLinks } = schema;
   const live = inArray(pages.status, ["published", "noindex"]);
 

@@ -10,7 +10,7 @@ import { TOOL_LAYOUTS, type Page } from "../src/schemas/page";
 import type { PageSpec } from "../src/lib/content";
 
 export async function writePages(url: string, pages: Page[], specs: PageSpec[]) {
-  const client = postgres(url, { max: 1 });
+  const client = postgres(url, { max: 1, prepare: false });
   const db = drizzle(client, { schema });
   try {
     // Engine field definitions depend on params, so record them as seen with the
