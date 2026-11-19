@@ -4,6 +4,7 @@ import { UNIT_CATEGORIES, type UnitParams } from "../../src/engines/units";
 import type { TextParams } from "../../src/engines/text";
 import type { PageSpec } from "../../src/lib/content";
 import { SAMPLE_TEXT } from "../../src/db/seed-specs";
+import { FORMULA_TOOLS } from "../../src/formulas";
 import type { LlmClient } from "./llm";
 import type { KeywordRow, PipelineSpec, PipelineState, Unmapped } from "./types";
 
@@ -19,6 +20,8 @@ export function signatureOf(engine: string, params: Record<string, unknown>): st
   if (engine === "loan") return `loan:${String(params.loanLabel).toLowerCase()}`;
   if (engine === "units") return `units:${params.from}:${params.to}`;
   if (engine === "text") return `text:${params.focus}:${params.limit ?? ""}:${String(params.context ?? "").toLowerCase()}`;
+  // Same outputs from the same expressions = the same calculator.
+  if (engine === "formula") return `formula:${(params.outputs as { expr: string }[]).map((o) => o.expr).join("|")}`;
   throw new Error(`No signature for engine ${engine}`);
 }
 
@@ -125,8 +128,18 @@ function mapText(keyword: string): Mapping | null {
   return isChars ? text({ focus: "characters" }, "characters") : text({ focus: "words" }, "words");
 }
 
+// ── Formula tools ───────────────────────────────────────────────────────────
+// Keywords a formula tool already targets map onto it, so they merge into the
+// existing page. New formula tools are added by hand in src/formulas.
+
+function mapFormula(keyword: string): Mapping | null {
+  const k = keyword.toLowerCase().trim();
+  const tool = FORMULA_TOOLS.find((t) => t.keyword === k || t.secondary.includes(k));
+  return tool ? { engine: "formula", params: tool.params as unknown as Record<string, unknown>, primaryOutput: tool.primaryOutput } : null;
+}
+
 export function ruleMap(keyword: string): Mapping | null {
-  return mapUnits(keyword) ?? mapLoan(keyword) ?? mapText(keyword);
+  return mapFormula(keyword) ?? mapUnits(keyword) ?? mapLoan(keyword) ?? mapText(keyword);
 }
 
 // ── LLM fallback ────────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import type { Cluster } from "@/schemas/page";
 import type { PageSpec } from "@/lib/content";
+import { formulaSpecs } from "@/formulas";
 
 // Stand-in for the keyword ingest step: in production these rows come from
 // a keyword export, clustered and mapped to engines by scripts/pipeline.
@@ -7,6 +8,8 @@ export const CLUSTERS: Cluster[] = [
   { slug: "finance", name: "Loan & Finance Calculators", intent: "calculate", description: "Payment, interest and amortization calculators for every common loan type." },
   { slug: "converters", name: "Unit Converters", intent: "convert", description: "Exact conversions for weight, length, temperature and volume, with printable charts." },
   { slug: "text", name: "Writing & Text Tools", intent: "check", description: "Count words and characters, estimate reading time and check keyword density." },
+  { slug: "math", name: "Math & Percentage Calculators", intent: "calculate", description: "Percentages, percentage change, discounts and tips, with the working shown for every answer." },
+  { slug: "health", name: "Health & Fitness Calculators", intent: "calculate", description: "BMI and other body measurements, in metric or US units, with the standard ranges explained." },
 ];
 
 const loan = (slug: string, keyword: string, volume: number, secondary: string[], params: Record<string, unknown>): PageSpec =>
@@ -92,4 +95,7 @@ export const PAGE_SPECS: PageSpec[] = [
       { q: "How fast should I speak in a presentation?", a: "Between 120 and 150 words per minute is comfortable for most audiences. Slow down for technical material." },
     ],
   }),
+
+  // Data-only calculators on the formula engine (src/formulas).
+  ...formulaSpecs(),
 ];

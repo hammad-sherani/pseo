@@ -21,6 +21,8 @@ export interface OutputField {
   label: string;
   format?: NumberFormat;
   unit?: string;
+  /** Always placed in the UI instead of being left to the variant roll. */
+  essential?: boolean;
 }
 
 export interface Table {

@@ -18,3 +18,9 @@ export function formatNumber(value: number, format: NumberFormat = "number", uni
       return `${Number(value.toPrecision(8)).toLocaleString("en-US", { maximumFractionDigits: 6 })}${unit ? ` ${unit}` : ""}`;
   }
 }
+
+export const ACRONYMS = new Set(["rv", "sba", "sms", "mpg", "apr", "seo", "usd", "bmi", "pdf"]);
+
+/** A phrase in running text: lower case, but acronyms stay upright ("bmi calculator" → "BMI calculator"). */
+export const prose = (s: string) =>
+  s.replace(/\b\w+\b/g, (w) => (ACRONYMS.has(w.toLowerCase()) || (w.length > 1 && /^[A-Z]+$/.test(w)) ? w.toUpperCase() : w.toLowerCase()));

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ComponentType } from "react";
 import type { ContentSection, Page } from "@/schemas/page";
 import { pagePath } from "@/seo";
+import { prose } from "@/lib/format";
 import { ArrowRightIcon, ChevronIcon } from "@/components/icons";
 
 interface SectionProps {
@@ -14,7 +15,7 @@ interface SectionProps {
 function HowTo({ page }: SectionProps) {
   return (
     <section aria-labelledby="how-to" className="prose">
-      <h2 id="how-to">How to use the {page.primaryKeyword}</h2>
+      <h2 id="how-to">How to use the {prose(page.primaryKeyword)}</h2>
       <ol className="steps-list">{page.content.howTo.map((s) => <li key={s}>{s}</li>)}</ol>
     </section>
   );

@@ -41,11 +41,28 @@ request /[cluster]/[slug]
 
 **Quality gate:** sibling pages are compared with 4-word shingle Jaccard similarity. Copy that is too templated gets a low score and ships as `noindex`, and is left out of the sitemap. The `editorial` field on a spec holds page-specific copy (the slot the LLM step fills).
 
+## Adding a formula tool (most calculators)
+
+A calculator that is "numbers in → formula → numbers out" needs no code. Add an entry to a file in `src/formulas/` (`math.ts`, `health.ts`, `finance.ts`, or a new category file listed in `src/formulas/index.ts`):
+
+- `params.inputs`: number fields, or `options` for a choice whose value feeds the formula.
+- `params.outputs`: each has an `expr` in the small language in `src/engines/expr.ts` (`+ - * / ^`, comparisons, `sqrt`, `round(x, d)`, `if(c, a, b)`…). Later outputs can use earlier ones; the first is the headline.
+- `params.summary`: the answer sentence, with `{key}` placeholders. `params.verdict` adds a label for value ranges, such as BMI categories.
+- `formula.examples`, `editorial`: worked examples (computed by the engine) and page copy.
+- `checks`: at least one hand-verified answer. `npm test` runs every check and validates every expression.
+
+A new cluster also needs an entry in `CLUSTERS` in `src/db/seed-specs.ts`. Formula definitions travel in page params, so adding tools does not grow the browser bundle.
+
 ## Adding a tool type
 
+For tools that need real logic (schedules, dates, lists), write an engine.
+
 1. Write an engine in `src/engines/` (`inputs`, `outputs`, `defaults`, `run`, optional `formula`) and register it in `src/engines/index.ts`.
-2. Add a content builder in `src/lib/content.ts`. Worked-example numbers must come from `engine.run`.
-3. Add keyword specs and `npm test`. The tests check block compatibility, unique variants and duplicate copy.
+2. Add a lazily loaded entry for it in `RUNTIMES` in `src/components/ToolRuntime.tsx`, so only pages that use it download it.
+3. Add a content builder in `src/lib/content.ts`. Worked-example numbers must come from `engine.run`.
+4. Add keyword specs and `npm test`. The tests check block compatibility, unique variants and duplicate copy.
+
+On Windows, run tests from `C:\…` with an upper-case drive letter; from `c:\…` Vitest fails every suite with "Cannot read properties of undefined (reading 'config')".
 
 New blocks need a component in `src/blocks/{inputs,outputs}` and an entry in `src/blocks/catalog.ts`.
 

@@ -92,7 +92,8 @@ function roll(r: Rand, engine: Engine<any>, params: unknown, primaryOutput?: str
   const otherNumbers = byKind("number").filter((f) => f !== primary).slice(0, 2 + Math.floor(r() * 3));
   if (otherNumbers.length) groups.push({ block: pick(r, compatibleOutputBlocks("number", "many")), fields: otherNumbers.map((f) => f.key) });
   for (const f of byKind("text").filter((f) => f !== primary)) {
-    if (r() < 0.7) groups.push({ block: pick(r, compatibleOutputBlocks("text", "one")), fields: [f.key] });
+    // Essential fields skip the roll (and its random draw, so other pages keep their layouts).
+    if (f.essential || r() < 0.7) groups.push({ block: pick(r, compatibleOutputBlocks("text", "one")), fields: [f.key] });
   }
   for (const f of byKind("breakdown")) groups.push({ block: pick(r, compatibleOutputBlocks("breakdown", "one")), fields: [f.key] });
   outputs.push(...shuffle(r, groups));

@@ -6,8 +6,9 @@ import { getEngine } from "@/engines";
 import type { LoanParams } from "@/engines/loan";
 import { getUnit, type UnitParams } from "@/engines/units";
 import type { TextParams } from "@/engines/text";
+import type { FormulaParams } from "@/engines/formula";
 import type { Table } from "@/engines/types";
-import { formatNumber } from "@/lib/format";
+import { ACRONYMS, formatNumber, prose } from "@/lib/format";
 import type { Content, Seo } from "@/schemas/page";
 
 export interface PageSpec {
@@ -19,6 +20,13 @@ export interface PageSpec {
   volume: number;
   params: Record<string, unknown>;
   primaryOutput?: string;
+  /** Formula-engine pages only: copy inputs that are not part of the shipped params. */
+  formula?: {
+    /** Noun phrase for the intro, e.g. "your body mass index (BMI)". */
+    subject: string;
+    /** Worked examples; the answers are computed by the engine. */
+    examples: { title: string; values: Record<string, number> }[];
+  };
   /**
    * Page-specific copy (from the LLM step or an editor). It is what keeps
    * siblings that share an engine from reading as near-duplicates.
@@ -31,7 +39,6 @@ export interface PageSpec {
   };
 }
 
-const ACRONYMS = new Set(["rv", "sba", "sms", "mpg", "apr", "seo", "usd", "bmi", "pdf"]);
 const titleCase = (s: string) =>
   s.replace(/\b\w+/g, (w) => (ACRONYMS.has(w.toLowerCase()) ? w.toUpperCase() : w[0].toUpperCase() + w.slice(1)));
 const usd = (x: number) => formatNumber(x, "currency");
@@ -122,7 +129,35 @@ function textContent(spec: PageSpec): Content {
   };
 }
 
-const BUILDERS: Record<string, (s: PageSpec) => Content> = { loan: loanContent, units: unitContent, text: textContent };
+const listJoin = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`);
+
+function formulaContent(spec: PageSpec): Content {
+  const p = spec.params as unknown as FormulaParams;
+  const e = getEngine("formula");
+  const base = e.defaults(p);
+  const tool = spec.formula!;
+  const runWith = (values: Record<string, number>) => e.run({ ...base, ...values }, p);
+  const answer = (out: ReturnType<typeof runWith>) => `${out.summary}.`;
+  const first = runWith({});
+  const inputNames = p.inputs.map((i) => prose(i.label));
+  const outputNames = p.outputs.map((o) => prose(o.label));
+  return {
+    h1: titleCase(spec.keyword),
+    intro: `Work out ${tool.subject} in seconds. Enter the ${listJoin(inputNames)} and this ${prose(spec.keyword)} shows the ${listJoin(outputNames)}, updating as you type. ${answer(first)}`,
+    howTo: [
+      ...p.inputs.map((i) => (i.options ? `Choose the ${prose(i.label)}.` : `Enter the ${prose(i.label)}${i.unit ? ` in ${i.unit}` : ""}.`)),
+      `Read the ${outputNames[0]}${outputNames.length > 1 ? `, with the ${listJoin(outputNames.slice(1))} beside it` : ""}.`,
+    ],
+    examples: tool.examples.map((x) => ({ title: x.title, detail: answer(runWith(x.values)) })),
+    formula: p.formula,
+    faq: [
+      { q: `How is the ${outputNames[0]} calculated?`, a: `${p.formula}. With the starting values above: ${answer(first)}` },
+      { q: "Is anything I enter stored?", a: "No. The calculation runs in your browser and nothing you type is sent anywhere." },
+    ],
+  };
+}
+
+const BUILDERS: Record<string, (s: PageSpec) => Content> = { loan: loanContent, units: unitContent, text: textContent, formula: formulaContent };
 
 /**
  * Template content for the engine, with page-specific editorial copy layered
@@ -150,6 +185,6 @@ export function buildSeo(spec: PageSpec, content: Content): Seo {
     title: withSuffix.length <= 50 ? withSuffix : content.h1.slice(0, 60),
     description: content.intro.length <= 160 ? content.intro : `${content.intro.slice(0, content.intro.lastIndexOf(" ", 156))}…`,
     schemaType: "WebApplication",
-    applicationCategory: spec.engine === "loan" ? "FinanceApplication" : "UtilitiesApplication",
+    applicationCategory: spec.cluster === "finance" ? "FinanceApplication" : spec.cluster === "health" ? "HealthApplication" : "UtilitiesApplication",
   };
 }

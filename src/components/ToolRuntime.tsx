@@ -1,7 +1,7 @@
 "use client";
-import { useMemo, useRef, useState } from "react";
-import { getEngine } from "@/engines";
-import type { InputValues, OutputValues } from "@/engines/types";
+import { useMemo, useRef, useState, type ComponentType } from "react";
+import dynamic from "next/dynamic";
+import type { Engine, InputValues, OutputValues } from "@/engines/types";
 import type { UiConfig } from "@/schemas/page";
 import { INPUT_COMPONENTS } from "@/blocks/inputs";
 import { OUTPUT_COMPONENTS } from "@/blocks/outputs";
@@ -15,12 +15,35 @@ interface Props {
   ui: UiConfig;
 }
 
+type ViewProps = Omit<Props, "engineKey">;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const withEngine = (engine: Engine<any>) =>
+  function EngineTool(props: ViewProps) {
+    return <ToolView engine={engine} {...props} />;
+  };
+
+// One chunk per engine, so a page downloads only the engine it uses. Every
+// key in src/engines/index.ts needs an entry here (tests/formula.test.ts checks).
+const RUNTIMES: Record<string, ComponentType<ViewProps>> = {
+  loan: dynamic(() => import("@/engines/loan").then((m) => withEngine(m.loanEngine))),
+  units: dynamic(() => import("@/engines/units").then((m) => withEngine(m.unitsEngine))),
+  text: dynamic(() => import("@/engines/text").then((m) => withEngine(m.textEngine))),
+  formula: dynamic(() => import("@/engines/formula").then((m) => withEngine(m.formulaEngine))),
+};
+
 /**
  * The only client island on a tool page. It is server-rendered with the
  * engine defaults, so the initial HTML already contains a real result.
  */
-export function ToolRuntime({ slug, engineKey, params, ui }: Props) {
-  const engine = getEngine(engineKey);
+export function ToolRuntime({ engineKey, ...props }: Props) {
+  const Runtime = RUNTIMES[engineKey];
+  if (!Runtime) throw new Error(`No client runtime for engine "${engineKey}"`);
+  return <Runtime {...props} />;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ToolView({ engine, slug, params, ui }: ViewProps & { engine: Engine<any> }) {
   const fields = useMemo(() => engine.inputs(params), [engine, params]);
   const outFields = useMemo(() => engine.outputs(params), [engine, params]);
   const defaults = useMemo(() => engine.defaults(params), [engine, params]);
