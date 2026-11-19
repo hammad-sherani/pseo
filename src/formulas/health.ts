@@ -90,4 +90,58 @@ export const HEALTH_FORMULAS: FormulaTool[] = [
     },
     checks: [{ values: { weight: 160, feet: 5, inches: 9 }, expect: { bmi: 23.6, low: 125, high: 169, verdict: "healthy weight" } }],
   },
+  {
+    slug: "calorie-calculator",
+    cluster: "health",
+    keyword: "calorie calculator",
+    volume: 1200000,
+    secondary: ["tdee calculator", "bmr calculator", "maintenance calorie calculator"],
+    params: {
+      inputs: [
+        // The option values are the Mifflin-St Jeor sex constants.
+        { key: "sex", label: "Sex", default: 5, options: [{ value: 5, label: "Male" }, { value: -161, label: "Female" }] },
+        { key: "age", label: "Age", unit: "years", default: 30, min: 15, max: 80, step: 1 },
+        { key: "weight", label: "Weight", unit: "kg", default: 70, min: 30, max: 250, step: 0.5 },
+        { key: "height", label: "Height", unit: "cm", default: 175, min: 120, max: 230, step: 1 },
+        {
+          key: "activity", label: "Activity level", default: 1.55,
+          options: [
+            { value: 1.2, label: "Sedentary (little or no exercise)" },
+            { value: 1.375, label: "Light (exercise 1–3 days a week)" },
+            { value: 1.55, label: "Moderate (exercise 3–5 days a week)" },
+            { value: 1.725, label: "Very active (6–7 days a week)" },
+            { value: 1.9, label: "Extra active (physical job or twice a day)" },
+          ],
+        },
+      ],
+      outputs: [
+        { key: "maintain", label: "Calories to maintain weight", unit: "kcal/day", expr: "round((10 * weight + 6.25 * height - 5 * age + sex) * activity)" },
+        { key: "bmr", label: "Basal metabolic rate (BMR)", unit: "kcal/day", expr: "round(10 * weight + 6.25 * height - 5 * age + sex)" },
+        { key: "lose", label: "Mild weight loss (−500 kcal)", unit: "kcal/day", expr: "maintain - 500" },
+        { key: "gain", label: "Mild weight gain (+500 kcal)", unit: "kcal/day", expr: "maintain + 500" },
+      ],
+      summary: "You burn about {maintain} kcal a day; your BMR is {bmr} kcal",
+      formula: "BMR = 10 × weight (kg) + 6.25 × height (cm) − 5 × age + 5 (male) or − 161 (female); daily calories = BMR × activity factor",
+    },
+    formula: {
+      subject: "how many calories you burn each day",
+      examples: [
+        { title: "A 25-year-old woman, 60 kg, 165 cm, sedentary", values: { sex: -161, age: 25, weight: 60, height: 165, activity: 1.2 } },
+        { title: "A 40-year-old man, 90 kg, 182 cm, lightly active", values: { sex: 5, age: 40, weight: 90, height: 182, activity: 1.375 } },
+        { title: "A 55-year-old woman, 72 kg, 160 cm, moderately active", values: { sex: -161, age: 55, weight: 72, height: 160, activity: 1.55 } },
+      ],
+    },
+    editorial: {
+      intro: "Estimate how many calories your body uses in a day. Enter your sex, age, weight, height and activity level to get your basal metabolic rate (BMR), the calories that keep your weight steady and targets for mild loss or gain.",
+      faq: [
+        { q: "Which formula does this calculator use?", a: "The Mifflin-St Jeor equation, published in 1990. Studies comparing BMR equations have found it among the most accurate for most adults, though any equation can be off by around 10% for an individual." },
+        { q: "How fast will a 500-calorie deficit make me lose weight?", a: "Roughly 0.5 kg (about 1 lb) a week at first. Weight loss usually slows over time as your body adapts, so adjust your target every few weeks." },
+        { q: "How low should I go?", a: "Common guidance is not to eat below about 1,200 kcal a day for women or 1,500 for men without medical supervision. Talk to a doctor or dietitian before a big change." },
+      ],
+    },
+    checks: [
+      { values: { sex: 5, age: 30, weight: 80, height: 180, activity: 1.55 }, expect: { bmr: 1780, maintain: 2759, lose: 2259 } },
+      { values: { sex: -161, age: 25, weight: 60, height: 165, activity: 1.2 }, expect: { bmr: 1345, maintain: 1614 } },
+    ],
+  },
 ];

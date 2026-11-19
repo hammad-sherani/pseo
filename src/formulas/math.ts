@@ -179,4 +179,149 @@ export const MATH_FORMULAS: FormulaTool[] = [
     },
     checks: [{ values: { bill: 100, tipPercent: 20, people: 4 }, expect: { tip: 20, total: 120, perPerson: 30 } }],
   },
+  {
+    slug: "sales-tax-calculator",
+    cluster: "math",
+    keyword: "sales tax calculator",
+    volume: 300000,
+    secondary: ["tax calculator", "price with tax calculator"],
+    params: {
+      inputs: [
+        { key: "price", label: "Price before tax", format: "currency", default: 49.99, min: 0, step: 1 },
+        { key: "rate", label: "Sales tax rate", unit: "%", default: 8.25, min: 0, max: 30, step: 0.25 },
+      ],
+      outputs: [
+        { key: "total", label: "Total price", format: "currency", expr: "price * (1 + rate / 100)", decimals: 2 },
+        { key: "tax", label: "Sales tax", format: "currency", expr: "total - price", decimals: 2 },
+      ],
+      summary: "{rate}% tax on {price} adds {tax}, for a total of {total}",
+      formula: "Total = price × (1 + tax rate ÷ 100)",
+    },
+    formula: {
+      subject: "the sales tax on a purchase and the total you pay",
+      examples: [
+        { title: "A $1,200 TV at 7.25%", values: { price: 1200, rate: 7.25 } },
+        { title: "A $35 meal at 9.5%", values: { price: 35, rate: 9.5 } },
+        { title: "A $28,000 car at 6%", values: { price: 28000, rate: 6 } },
+      ],
+    },
+    editorial: {
+      intro: "Add sales tax to any price. Enter the price before tax and your local rate to see exactly how much tax you will pay and the total at the register.",
+      faq: [
+        { q: "How do I find the price before tax from a total?", a: "Divide the total by 1 plus the rate as a decimal. At 8%, a $54 total is $54 ÷ 1.08 = $50 before tax." },
+        { q: "Which US states have no statewide sales tax?", a: "Alaska, Delaware, Montana, New Hampshire and Oregon. Alaska still lets cities and boroughs charge their own local sales tax." },
+        { q: "Why does my receipt differ by a cent?", a: "Stores usually work out tax per item or per receipt and round to the cent at different points, so totals can differ slightly from a single calculation." },
+      ],
+    },
+    checks: [{ values: { price: 100, rate: 8 }, expect: { tax: 8, total: 108 } }],
+  },
+  {
+    slug: "area-of-a-circle-calculator",
+    cluster: "math",
+    keyword: "area of a circle calculator",
+    volume: 90000,
+    secondary: ["circle calculator", "circumference calculator"],
+    params: {
+      inputs: [{ key: "radius", label: "Radius", default: 5, min: 0, step: 0.5 }],
+      outputs: [
+        { key: "area", label: "Area", expr: "pi * radius ^ 2", decimals: 4 },
+        { key: "circumference", label: "Circumference", expr: "2 * pi * radius", decimals: 4 },
+        { key: "diameter", label: "Diameter", expr: "2 * radius", decimals: 4 },
+      ],
+      summary: "A circle with radius {radius} has an area of {area} and a circumference of {circumference}",
+      formula: "Area = π × r²; circumference = 2 × π × r",
+    },
+    formula: {
+      subject: "the area, circumference and diameter of a circle",
+      examples: [
+        { title: "A 12-inch pizza (radius 6 in)", values: { radius: 6 } },
+        { title: "A garden bed with a 1.5 m radius", values: { radius: 1.5 } },
+        { title: "A coin with a 1.2 cm radius", values: { radius: 1.2 } },
+      ],
+    },
+    editorial: {
+      intro: "Enter a circle's radius to get its area, circumference and diameter at once. Results are in the same unit you use for the radius, squared for the area.",
+      faq: [
+        { q: "What if I only know the diameter?", a: "Halve it to get the radius. A circle 10 cm across has a 5 cm radius and an area of about 78.54 cm²." },
+        { q: "What value of π does this use?", a: "The full double-precision value, 3.141592653589793. Using 3.14 instead changes the answer by about 0.05%." },
+        { q: "Why does a pizza twice as wide have four times the area?", a: "Area grows with the square of the radius. Doubling the radius multiplies r² by four, so a 16-inch pizza has four times the area of an 8-inch one." },
+      ],
+    },
+    checks: [{ values: { radius: 5 }, expect: { area: 78.5398, circumference: 31.4159, diameter: 10 } }],
+  },
+  {
+    slug: "pythagorean-theorem-calculator",
+    cluster: "math",
+    keyword: "pythagorean theorem calculator",
+    volume: 165000,
+    secondary: ["hypotenuse calculator", "right triangle calculator"],
+    params: {
+      inputs: [
+        { key: "a", label: "Side a", default: 3, min: 0, step: 1 },
+        { key: "b", label: "Side b", default: 4, min: 0, step: 1 },
+      ],
+      outputs: [
+        { key: "c", label: "Hypotenuse c", expr: "sqrt(a ^ 2 + b ^ 2)", decimals: 4 },
+        { key: "area", label: "Area", expr: "a * b / 2", decimals: 4 },
+        { key: "perimeter", label: "Perimeter", expr: "a + b + c", decimals: 4 },
+      ],
+      summary: "A right triangle with sides {a} and {b} has a hypotenuse of {c}",
+      formula: "c = √(a² + b²)",
+    },
+    formula: {
+      subject: "the hypotenuse of a right triangle",
+      examples: [
+        { title: "Sides of 5 and 12", values: { a: 5, b: 12 } },
+        { title: "A ladder 2 m out from a wall, reaching 6 m up", values: { a: 2, b: 6 } },
+        { title: "A 40 by 30 ft lot, corner to corner", values: { a: 40, b: 30 } },
+      ],
+    },
+    editorial: {
+      intro: "Find the longest side of a right triangle from the other two. Enter sides a and b to get the hypotenuse, plus the triangle's area and perimeter.",
+      faq: [
+        { q: "Does the Pythagorean theorem work for every triangle?", a: "No, only for triangles with a 90° angle. For other triangles use the law of cosines, which adds a correction term for the angle." },
+        { q: "How do I find a missing short side?", a: "Rearrange the formula: a = √(c² − b²). With a hypotenuse of 13 and one side of 12, the other side is √(169 − 144) = 5." },
+        { q: "What is a Pythagorean triple?", a: "Three whole numbers that fit a² + b² = c², such as 3-4-5, 5-12-13 and 8-15-17. Builders use 3-4-5 to check corners are square." },
+      ],
+    },
+    checks: [{ values: { a: 3, b: 4 }, expect: { c: 5, area: 6, perimeter: 12 } }],
+  },
+  {
+    slug: "fuel-cost-calculator",
+    cluster: "math",
+    keyword: "fuel cost calculator",
+    volume: 90000,
+    secondary: ["gas cost calculator", "trip cost calculator"],
+    params: {
+      inputs: [
+        { key: "distance", label: "Trip distance", unit: "mi", default: 300, min: 0, step: 10 },
+        { key: "mpg", label: "Fuel economy", unit: "mpg", default: 28, min: 1, max: 150, step: 1 },
+        { key: "price", label: "Gas price per gallon", format: "currency", default: 3.5, min: 0, step: 0.05 },
+      ],
+      outputs: [
+        { key: "cost", label: "Fuel cost", format: "currency", expr: "distance / mpg * price", decimals: 2 },
+        { key: "gallons", label: "Fuel used", unit: "gal", expr: "distance / mpg", decimals: 2 },
+        { key: "perMile", label: "Cost per mile", format: "currency", expr: "price / mpg", decimals: 3 },
+      ],
+      summary: "Driving {distance} miles at {mpg} mpg uses {gallons} gallons, costing {cost}",
+      formula: "Fuel cost = distance ÷ mpg × price per gallon",
+    },
+    formula: {
+      subject: "how much gas a trip will cost",
+      examples: [
+        { title: "A 450-mile road trip in a 32 mpg car", values: { distance: 450, mpg: 32, price: 3.4 } },
+        { title: "A 1,200-mile move in a 15 mpg truck", values: { distance: 1200, mpg: 15, price: 3.9 } },
+        { title: "A 30-mile daily commute at 25 mpg", values: { distance: 30, mpg: 25, price: 3.5 } },
+      ],
+    },
+    editorial: {
+      intro: "Estimate the gas bill for a road trip or commute. Enter the distance, your car's fuel economy and the price per gallon to get the total fuel cost, the gallons used and the cost per mile.",
+      faq: [
+        { q: "How do I convert L/100 km to mpg?", a: "Divide 235.2 by the L/100 km figure. A car using 7 L/100 km gets about 33.6 US mpg." },
+        { q: "How do I split gas money for a shared trip?", a: "Divide the fuel cost by the number of people. Some groups also add a share of tolls and parking." },
+        { q: "Why is my real fuel use higher than the rated mpg?", a: "Rated figures come from standard tests. Highway speed, air conditioning, roof racks, cold weather and heavy loads all lower real-world mpg." },
+      ],
+    },
+    checks: [{ values: { distance: 300, mpg: 25, price: 3.5 }, expect: { gallons: 12, cost: 42, perMile: 0.14 } }],
+  },
 ];

@@ -151,7 +151,7 @@ function formulaContent(spec: PageSpec): Content {
     examples: tool.examples.map((x) => ({ title: x.title, detail: answer(runWith(x.values)) })),
     formula: p.formula,
     faq: [
-      { q: `How is the ${outputNames[0]} calculated?`, a: `${p.formula}. With the starting values above: ${answer(first)}` },
+      { q: `How does the ${prose(spec.keyword)} work?`, a: `It uses this formula: ${p.formula}. With the starting values above: ${answer(first)}` },
       { q: "Is anything I enter stored?", a: "No. The calculation runs in your browser and nothing you type is sent anywhere." },
     ],
   };

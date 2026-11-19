@@ -8,8 +8,8 @@ export const CLUSTERS: Cluster[] = [
   { slug: "finance", name: "Loan & Finance Calculators", intent: "calculate", description: "Payment, interest and amortization calculators for every common loan type." },
   { slug: "converters", name: "Unit Converters", intent: "convert", description: "Exact conversions for weight, length, temperature and volume, with printable charts." },
   { slug: "text", name: "Writing & Text Tools", intent: "check", description: "Count words and characters, estimate reading time and check keyword density." },
-  { slug: "math", name: "Math & Percentage Calculators", intent: "calculate", description: "Percentages, percentage change, discounts and tips, with the working shown for every answer." },
-  { slug: "health", name: "Health & Fitness Calculators", intent: "calculate", description: "BMI and other body measurements, in metric or US units, with the standard ranges explained." },
+  { slug: "math", name: "Math & Everyday Calculators", intent: "calculate", description: "Percentages, discounts, tips, sales tax, geometry and trip costs, with the working shown for every answer." },
+  { slug: "health", name: "Health & Fitness Calculators", intent: "calculate", description: "BMI, daily calories and other body measurements, with the standard ranges explained." },
 ];
 
 const loan = (slug: string, keyword: string, volume: number, secondary: string[], params: Record<string, unknown>): PageSpec =>
