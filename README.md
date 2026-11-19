@@ -8,11 +8,11 @@ npm test            # engine maths + page assembly invariants
 npm run build && npm start
 ```
 
-Without `DATABASE_URL` the site serves the in-repo seed (`src/db/seed-specs.ts`). To use Postgres:
+Without `PSEO_DATABASE_URL` the site serves the in-repo seed (`src/db/seed-specs.ts`). To use Postgres:
 
 ```bash
-DATABASE_URL=postgres://... npm run db:push   # create tables from src/db/schema.ts
-DATABASE_URL=postgres://... npm run db:seed   # write assembled pages
+PSEO_DATABASE_URL=postgres://... npm run db:push   # create tables from src/db/schema.ts
+PSEO_DATABASE_URL=postgres://... npm run db:seed   # write assembled pages
 ```
 
 ## How a page is built
@@ -85,7 +85,7 @@ npm run pipeline -- status
 | ingest | Parses CSV, normalises and dedupes keywords (highest volume wins) | `scripts/pipeline/ingest.ts` |
 | map | Rule tables map keywords to an engine + params (unit aliases, loan presets, platform character limits). Keywords with the same engine+params *signature* become one page (biggest keyword primary, the rest secondary); signatures an existing page already serves are recorded as covered, not duplicated. Leftovers go to Claude in batches of 25 with a strict schema; its mappings land in `needs_review`. | `scripts/pipeline/map.ts` |
 | generate | Claude gets a facts sheet computed by the engine (defaults, results, chart rows, formula, worked examples) plus sibling intros to avoid, and returns `{intro, howTo, faq}`. Each draft is checked: every figure must appear in the facts (small integers excepted), copy-only overlap with siblings must stay under 50%, and the page must clear the site's indexing score. A failed draft gets one retry with the problems quoted back; a second failure is marked `failed` and retried on the next run. | `scripts/pipeline/generate.ts` |
-| publish | Releases up to `--per-day` generated pages per UTC day, highest volume first. Writes `data/published-specs.json` (read by the site without a database), upserts rows when `DATABASE_URL` is set, and calls `/api/revalidate` when `SITE_URL` and `REVALIDATE_SECRET` are set. | `scripts/pipeline/publish.ts` |
+| publish | Releases up to `--per-day` generated pages per UTC day, highest volume first. Writes `data/published-specs.json` (read by the site without a database), upserts rows when `PSEO_DATABASE_URL` is set, and calls `/api/revalidate` when `SITE_URL` and `REVALIDATE_SECRET` are set. | `scripts/pipeline/publish.ts` |
 
 **Claude settings** (`scripts/pipeline/llm.ts`): `claude-opus-5-5` (override with `PIPELINE_MODEL`), effort `medium`, structured output via `betaZodOutputFormat`, cached system prompt, and server-side refusal fallback (`fallbacks: "default"`), so a safety decline is retried on another model inside the same call. Credentials come from `ANTHROPIC_API_KEY`, or pass `--llm` to use an `ant auth login` profile. Without credentials, `map` still runs the rules and leaves the rest pending.
 
@@ -94,6 +94,6 @@ Loan rates and terms come from presets in `map.ts` that an editor maintains. The
 ## Not built yet
 
 - `/admin` review/preview UI (review happens in the CLI for now), GSC import into `page_metrics`, redirect middleware for `redirects`.
-- The Postgres paths (`pgRepo`, `scripts/seed.ts`, `publish` with `DATABASE_URL`) type-check but have not been run against a live database.
+- The Postgres paths (`pgRepo`, `scripts/seed.ts`, `publish` with `PSEO_DATABASE_URL`) type-check but have not been run against a live database.
 - The Claude calls have only run against a fake client in tests; no live generation run has been done yet.
 # pseo

@@ -30,7 +30,7 @@ function publishedSpecs(): PageSpec[] {
   }
 }
 
-// Without DATABASE_URL the site serves the in-repo seed plus pipeline output, so it runs anywhere.
+// Without PSEO_DATABASE_URL the site serves the in-repo seed plus pipeline output, so it runs anywhere.
 function seedRepo(): PageRepo {
   const pages = assemblePages([...PAGE_SPECS, ...publishedSpecs()], "2026-10-27T00:00:00.000Z")
     .filter(indexable)
@@ -103,7 +103,7 @@ function pgRepo(url: string): PageRepo {
 
 let repo: PageRepo | undefined;
 export function getRepo(): PageRepo {
-  return (repo ??= process.env.DATABASE_URL ? pgRepo(process.env.DATABASE_URL) : seedRepo());
+  return (repo ??= process.env.PSEO_DATABASE_URL ? pgRepo(process.env.PSEO_DATABASE_URL) : seedRepo());
 }
 
 /** Request-deduped lookup shared by generateMetadata and the page component. */

@@ -108,12 +108,12 @@ switch (command) {
     saveJson(PUBLISHED_FILE, specs);
     console.log(`Published ${batch.length} pages today${batch.length ? `: ${batch.map((s) => s.slug).join(", ")}` : ""}.`);
 
-    if (batch.length && process.env.DATABASE_URL) {
+    if (batch.length && process.env.PSEO_DATABASE_URL) {
       const { writePages } = await import("../db-write");
       // Assemble everything so variants and quality scores see all siblings, then write only the new pages.
       const all = [...PAGE_SPECS, ...specs];
       const slugs = new Set(batch.map((s) => s.slug));
-      await writePages(process.env.DATABASE_URL, assemblePages(all).filter((p) => slugs.has(p.slug)), all);
+      await writePages(process.env.PSEO_DATABASE_URL, assemblePages(all).filter((p) => slugs.has(p.slug)), all);
       console.log(`Wrote ${batch.length} rows to Postgres.`);
     }
     if (batch.length && process.env.SITE_URL && process.env.REVALIDATE_SECRET) {

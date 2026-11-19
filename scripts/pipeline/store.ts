@@ -3,7 +3,7 @@ import path from "node:path";
 import type { PipelineState } from "./types";
 
 export const STATE_FILE = path.resolve(process.env.PIPELINE_STATE ?? "data/pipeline/state.json");
-/** Read by the site (src/db/queries.ts) when no DATABASE_URL is set. */
+/** Read by the site (src/db/queries.ts) when no PSEO_DATABASE_URL is set. */
 export const PUBLISHED_FILE = path.resolve("data/published-specs.json");
 
 export const emptyState = (): PipelineState => ({ version: 1, keywords: [], covered: [], unmapped: [], specs: [] });
