@@ -2,7 +2,18 @@ import type { Metadata } from "next";
 import type { Cluster, Page } from "@/schemas/page";
 import { INDEX_THRESHOLD } from "@/lib/quality";
 
-export const SITE_URL = (process.env.SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+// On Vercel, fall back to the production domain Vercel provides, so a missing
+// SITE_URL (or a localhost one copied from .env.example) never ships localhost
+// canonicals and sitemap links.
+const configuredUrl = process.env.SITE_URL?.trim();
+const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+export const SITE_URL = (
+  configuredUrl && !(vercelHost && /\/\/(localhost|127\.0\.0\.1)\b/.test(configuredUrl))
+    ? configuredUrl
+    : vercelHost
+      ? `https://${vercelHost}`
+      : "http://localhost:3000"
+).replace(/\/$/, "");
 export const SITE_NAME = "Toolhaus";
 /** Public contact address shown on /contact; unset hides the email link. */
 export const CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() ?? "";
